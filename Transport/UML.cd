@@ -1,65 +1,65 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="Transport.ABus">
-    <Position X="8" Y="5.5" Width="1.5" />
+    <Position X="3" Y="5.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>QAAAAAAUAIAAEAAAAgAACEQGAEAAgAAYJkEARAAAMAA=</HashCode>
+      <HashCode>QEAAAACUAIIAEAAAAgAACEQGAEAAgAAYJkEARAAAMAA=</HashCode>
       <FileName>ABus.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Transport.DieselBus">
-    <Position X="5.75" Y="8.25" Width="1.5" />
+    <Position X="0.75" Y="13.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAEAAAAEEAAAAAAAAQAAAAAgAAAIEAAAAAAIAA=</HashCode>
+      <HashCode>AAAAAAAEAQAAEEAAAAAAABQAAAAAgAAAIEAAAAAAIAA=</HashCode>
       <FileName>DieselBus.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Transport.ElectricBus">
-    <Position X="8" Y="8.25" Width="1.5" />
+    <Position X="3" Y="13.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAEAAAAEAAAAAAAAAQAAAAAgAAAIEAAAAAAIAA=</HashCode>
       <FileName>ElectricBus.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Transport.AEngine">
-    <Position X="3" Y="5.5" Width="1.5" />
+    <Position X="9.75" Y="5.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAARAAACAAAAAAIAAAgAAFAAAAQBAIJxAAAAAAAAI=</HashCode>
       <FileName>AEngine.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="Transport.DieselEngine">
-    <Position X="0.75" Y="11" Width="1.5" />
+  <Class Name="Transport.DieselEngine" Collapsed="true">
+    <Position X="16.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAABQAASAAAAAAIAAAABEBAAIAABAIKwAAAAAAAAI=</HashCode>
+      <HashCode>AAAAABQAASAAAAAAIAAAgBEBAAIAABAIKwAAAAAAAAI=</HashCode>
       <FileName>DieselEngine.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Transport.GasolineEngine">
-    <Position X="3" Y="11" Width="1.5" />
+    <Position X="8.5" Y="11.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAABAAACAAAAAAIAAAgAABAAAAABAIIwAAAAAAAAI=</HashCode>
       <FileName>GasolineEngine.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Transport.ElectricEngine">
-    <Position X="5.25" Y="11" Width="1.5" />
+    <Position X="10.75" Y="11.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAABAAACAAAAAAIAAAgAABAAAAABAIIwAAAAAAAAI=</HashCode>
       <FileName>ElectricEngine.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Transport.GasolineBus">
-    <Position X="10.25" Y="8.25" Width="1.5" />
+    <Position X="5.25" Y="13.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAEAAAAEAAAAAAAAAQAAAAAgAAAIEAAAAAAIAA=</HashCode>
       <FileName>GasolineBus.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Transport.BusFactory" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="14.5" Y="0.5" Width="1.5" />
+    <Position X="15" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>BusFactory.cs</FileName>
@@ -67,7 +67,7 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Transport.EngineEventArgs" Collapsed="true">
-    <Position X="16.25" Y="0.5" Width="1.5" />
+    <Position X="13.25" Y="1.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>EngineEventArgs.cs</FileName>
@@ -84,35 +84,35 @@
   <Class Name="Transport.Child">
     <Position X="0.75" Y="3.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
       <FileName>Child.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Transport.Youth">
     <Position X="3" Y="3.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
       <FileName>Youth.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Transport.Adult">
     <Position X="5.25" Y="3.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
       <FileName>Adult.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Transport.Senior">
     <Position X="7.5" Y="3.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
       <FileName>Senior.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Transport.Handicapped">
     <Position X="9.75" Y="3.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
       <FileName>Handicapped.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -131,35 +131,35 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Transport.AStop" Collapsed="true">
-    <Position X="12.75" Y="0.5" Width="1.5" />
+    <Position X="13.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAIAAAAAgAAAAAAAACAAQAAAAAAAAAAAAAAAEAAAA=</HashCode>
       <FileName>AStop.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Interface Name="Transport.IVehicleFactory" Collapsed="true">
-    <Position X="14.5" Y="2.5" Width="1.5" />
+    <Position X="16.75" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>IVehicleFactory.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="Transport.IEngineController">
-    <Position X="14.5" Y="1.75" Width="1.5" />
+  <Interface Name="Transport.IEngineController" Collapsed="true">
+    <Position X="16.75" Y="2.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAABAAACAAAAAAAAAAAAABAAAAABAIIwAAAAAAAAI=</HashCode>
       <FileName>IEngineController.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Transport.ICustomer" Collapsed="true">
-    <Position X="12.75" Y="1.75" Width="1.5" />
+    <Position X="13.25" Y="2.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
       <FileName>ICustomer.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Transport.ITicketable" Collapsed="true">
-    <Position X="12.75" Y="2.5" Width="1.5" />
+    <Position X="15" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAA=</HashCode>
       <FileName>ITicketable.cs</FileName>
@@ -167,14 +167,14 @@
     </TypeIdentifier>
   </Interface>
   <Interface Name="Transport.IEnterable" Collapsed="true">
-    <Position X="16.25" Y="1.75" Width="1.5" />
+    <Position X="13.25" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAQAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>IEnterable.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="Transport.IDriveable">
-    <Position X="12.5" Y="4.75" Width="1.5" />
+  <Interface Name="Transport.IDriveable" Collapsed="true">
+    <Position X="15" Y="2.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAEAAAAEAAAAAAAAAQAAAAAgAAAIEAAAAAAIAA=</HashCode>
       <FileName>IDriveable.cs</FileName>
