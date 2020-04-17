@@ -145,7 +145,7 @@
     </TypeIdentifier>
   </Interface>
   <Interface Name="Transport.IEngineController" Collapsed="true">
-    <Position X="16.75" Y="2.75" Width="1.5" />
+    <Position X="16.5" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAABAAACAAAAAAAAAAAAABAAAAABAIIwAAAAAAAAI=</HashCode>
       <FileName>IEngineController.cs</FileName>
@@ -167,7 +167,7 @@
     </TypeIdentifier>
   </Interface>
   <Interface Name="Transport.IEnterable" Collapsed="true">
-    <Position X="13.25" Y="3.5" Width="1.5" />
+    <Position X="12.25" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAQAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>IEnterable.cs</FileName>
@@ -178,6 +178,13 @@
     <TypeIdentifier>
       <HashCode>AAAAAAAEAAAAEAAAAAAAAAQAAAAAgAAAIEAAAAAAIAA=</HashCode>
       <FileName>IDriveable.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Transport.ITicket" Collapsed="true">
+    <Position X="14.25" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAA=</HashCode>
+      <FileName>ITicket.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Font Name="Segoe UI" Size="9" />
