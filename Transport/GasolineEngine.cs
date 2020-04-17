@@ -93,5 +93,10 @@ namespace Transport
         {
             throw new NotImplementedException();
         }
+
+        protected override void CalculateFuelConsumption ()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

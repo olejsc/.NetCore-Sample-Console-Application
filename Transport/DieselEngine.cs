@@ -19,8 +19,6 @@ namespace Transport
             HorsePower = horsePower;
             Speed = 0;
             FuelConsumption = 0;
-            FuelFull += OnFuelFull;
-            FuelEmpty += OnFuelEmpty;
             Started = started;
         }
 
@@ -128,6 +126,7 @@ namespace Transport
 
         public override void Run (object time)
         {
+            Console.WriteLine($"Current fuel is: {Fuel.ToString()}");
             BusTime busTime = (BusTime)time;
             DateTime now = new DateTime();
             DateTime target = now.AddMilliseconds(busTime.Duration);
@@ -158,6 +157,7 @@ namespace Transport
                     }
                 }
             }
+            Console.WriteLine($"Current fuel is: {Fuel.ToString()}");
             Console.WriteLine($"Finnished running on DieselEngine, on thread :  {Thread.CurrentThread.Name.ToString()}!");
         }
 
@@ -174,12 +174,17 @@ namespace Transport
         void OnFuelEmpty(object sender, EngineEventArgs args)
         {
             Stop();
-            FuelFull.Invoke(this, new EngineEventArgs { Stopped = true });
+            FuelFull.Invoke(null, new EngineEventArgs { Stopped = true });
         }
 
         public void OnFuelFull (object sender, EngineEventArgs args)
         {
 
+        }
+
+        protected override void CalculateFuelConsumption ()
+        {
+            FuelConsumption = _horsePower / Speed;
         }
     }
 }

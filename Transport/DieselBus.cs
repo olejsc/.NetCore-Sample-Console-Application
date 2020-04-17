@@ -9,7 +9,8 @@ namespace Transport
     {
         public DieselBus () : base(6, false,2,20,8)
         {
-
+            //base.Engine.FuelFull += OnFuelFull;
+            //base.Engine.FuelEmpty += OnFuelEmpty;
         }
 
         public override event EventHandler<EventArgs> DayStart;
@@ -22,7 +23,7 @@ namespace Transport
         {
             BusTime busTime = (BusTime)time;
             EngineThread.Start(time);
-            //Thread.Sleep(Convert.ToInt32(time.Timestep));
+            //Thread.Sleep(Convert.ToInt32(busTime.Timestep));
         }
 
         public override void Stop ()
@@ -33,6 +34,16 @@ namespace Transport
         public void OnDayStart(object sender, EventArgs args)
         {
 
+        }
+
+        public void OnFuelEmpty (object sender, EngineEventArgs args)
+        {
+            Console.WriteLine("Fuel is empty!");
+        }
+
+        public void OnFuelFull (object sender, EngineEventArgs args)
+        {
+            Console.WriteLine("Fuel is full!");
         }
     }
 }

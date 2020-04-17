@@ -13,7 +13,7 @@ namespace Transport
             ABus[] busses = factory.CreateVehicles(4);
             Object time = new BusTime(ushort.MaxValue,100);
             Run(busses, time);
-
+            Console.ReadLine();
         }
 
         private static void Run (ABus[] busses, object time)
@@ -23,6 +23,7 @@ namespace Transport
                 bus.Drive(time);
             }
         }
+
 
         /*
          * You might be wondering then, "when should I use inheritance?" It depends on your problem at hand, but this is a decent list of when inheritance makes more sense than composition:

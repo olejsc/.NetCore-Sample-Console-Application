@@ -42,16 +42,27 @@ namespace Transport
 
         protected ABus (byte wheels = 6, bool isAtMaximumCapacity = false, byte handicapSeats = 2, byte seats = 20, byte standingSpots = 8)
         {
+            // buss "id"
             _busID = Guid.NewGuid();
+
+            // bus tecnical variables
             Wheels = wheels;
             Engine = new DieselEngine();
+
+
+            // Bus capacity
             IsAtMaximumCapacity = isAtMaximumCapacity;
             HandicapSeats = handicapSeats;
             Seats = seats;
+            StandingSpots = standingSpots;
             People = new List<ITicket>(seats + handicapSeats + standingSpots + 1);
+
+
+            // Thread
             _engineThread = new Thread(new ParameterizedThreadStart(Engine.Run));
             _engineThread.Name = $"Thread {BusID.ToString()}";
-            StandingSpots = standingSpots;
+            _engineThread.IsBackground = true;
+            Console.WriteLine($"Bus created: {BusID.ToString()}" );
 
         }
 

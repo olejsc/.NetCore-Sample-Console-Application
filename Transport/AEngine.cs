@@ -34,9 +34,6 @@ namespace Transport
         public abstract void Start ();
         public abstract void Stop ();
 
-        protected virtual void CalculateFuelConsumption ()
-        {
-            FuelConsumption = _horsePower / _speed;
-        }
+        protected abstract void CalculateFuelConsumption ();
     }
 }
