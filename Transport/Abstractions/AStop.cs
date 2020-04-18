@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Transport
 {
-    public abstract class AStop
+    public abstract class AStop : IObservable<ABus>
     {
         /// <summary>
         /// The name of the stop.
@@ -45,5 +45,7 @@ namespace Transport
             {
             }
         }
+
+        public abstract IDisposable Subscribe (IObserver<ABus> observer);
     }
 }
