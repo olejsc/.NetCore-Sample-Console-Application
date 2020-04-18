@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="Transport.ABus">
-    <Position X="3" Y="5.5" Width="1.5" />
+    <Position X="4" Y="6.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>QEAAAACUAIIAEAAAAgAACEQGAEAAgAAYJkEARAAAMAA=</HashCode>
       <FileName>ABus.cs</FileName>
@@ -76,7 +76,7 @@
   <Class Name="Transport.APerson">
     <Position X="5.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAABAAAAAAAEAAAAAAAAAAAAgAAIAgAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAABAAAAACAEAAAAAAAAAAAAgAAIAgAAAAAAA=</HashCode>
       <FileName>APerson.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -119,9 +119,10 @@
   <Class Name="Transport.ATicket">
     <Position X="0.5" Y="5.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AgAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAIAAA=</HashCode>
+      <HashCode>AgAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAEAAAAIAAA=</HashCode>
       <FileName>ATicket.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="Transport.AdultTicket">
     <Position X="0.5" Y="7.75" Width="1.5" />
@@ -151,10 +152,10 @@
       <FileName>IEngineController.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="Transport.ICustomer" Collapsed="true">
+  <Interface Name="Transport.ICustomer">
     <Position X="13.25" Y="2.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAABAAAAACAAAAAAAAIAAAAAAAAAAgAAAAAAA=</HashCode>
       <FileName>ICustomer.cs</FileName>
     </TypeIdentifier>
   </Interface>
@@ -166,21 +167,21 @@
       <NewMemberFileName>ITicket.cs</NewMemberFileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="Transport.IEnterable" Collapsed="true">
+  <Interface Name="Transport.IEnterable">
     <Position X="12.25" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAQAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>IEnterable.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="Transport.IDriveable" Collapsed="true">
+  <Interface Name="Transport.IDriveable">
     <Position X="15" Y="2.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAEAAAAEAAAAAAAAAQAAAAAgAAAIEAAAAAAIAA=</HashCode>
       <FileName>IDriveable.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="Transport.ITicket" Collapsed="true">
+  <Interface Name="Transport.ITicket">
     <Position X="14.25" Y="5.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAA=</HashCode>

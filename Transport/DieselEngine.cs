@@ -148,7 +148,7 @@ namespace Transport
                     {
                         Thread.Sleep(busTime.Timestep);
                         CalculateFuelConsumption();
-                        Fuel -= (ushort)FuelConsumption;
+                        Fuel -= 60;
                         if(Fuel == 0)
                         {
                             OnFuelEmpty(this, new EngineEventArgs { Stopped = true });

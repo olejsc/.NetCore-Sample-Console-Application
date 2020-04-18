@@ -6,6 +6,6 @@ namespace Transport
 {
     public interface ITicket
     {
-        void RegisterEntrance (ABus vehicle);
+        void RegisterEntrance (ITicketable bus);
     }
 }

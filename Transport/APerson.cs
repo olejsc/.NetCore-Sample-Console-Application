@@ -16,6 +16,8 @@ namespace Transport
         /// </summary>
         private ITicket _ticket;
 
+        private IEnterable _busEntrance;
+
         /// <summary>
         /// The age of the person.
         /// </summary>
@@ -28,6 +30,32 @@ namespace Transport
 
             set
             {
+            }
+        }
+
+        public ITicket Ticket
+        {
+            get
+            {
+                return _ticket;
+            }
+
+            set
+            {
+                _ticket = value;
+            }
+        }
+
+        public IEnterable BusEntrance
+        {
+            get
+            {
+                return _busEntrance;
+            }
+
+            set
+            {
+                _busEntrance = value;
             }
         }
 

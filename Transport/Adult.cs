@@ -8,7 +8,9 @@ namespace Transport
     {
         public override ITicket BuyTicket (APerson person)
         {
-            throw new NotImplementedException();
+            ITicket adultTicket = new AdultTicket();
+            Ticket = adultTicket;
+            return Ticket;
         }
 
         public override void ExtendTicket (ITicket ITicket)

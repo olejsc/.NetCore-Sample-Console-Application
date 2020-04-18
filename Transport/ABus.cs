@@ -73,11 +73,12 @@ namespace Transport
         {
             get
             {
-                throw new System.NotImplementedException();
+                return _wheels;
             }
 
             set
             {
+                _wheels = value;
             }
         }
 
@@ -101,7 +102,7 @@ namespace Transport
         {
             get
             {
-                return _isAtMaximumCapacity;
+                return People.Count < Seats + HandicapSeats + StandingSpots + 1;
             }
 
             protected set
@@ -180,14 +181,23 @@ namespace Transport
 
         public bool CanEnter (ITicket Ticket)
         {
-            throw new NotImplementedException();
+            // TODO: Add conditional logic to check if handicapped seats are taken for handicap-tickets etc.
+            // TODO: Check if ticket expired.
+            if (!IsAtMaximumCapacity)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public abstract void Drive (object time);
 
         public void RegisterEntrance (ITicket ticket)
         {
-            throw new NotImplementedException();
+            People.Add(ticket);
         }
 
         public abstract void Stop ();
