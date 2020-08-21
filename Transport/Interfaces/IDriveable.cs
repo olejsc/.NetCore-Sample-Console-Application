@@ -4,13 +4,16 @@ using System.Text;
 
 namespace Transport
 {
+    /// <summary>
+    /// Interface representing driving logic for vehicles.
+    /// </summary>
     public interface IDriveable
     {
-        event System.EventHandler<EventArgs>DayStart;
-        event System.EventHandler<EventArgs>DayEnd;
-        event System.EventHandler<EventArgs>EndRoute;
-        event System.EventHandler<EventArgs>ChangeRoute;
-        event System.EventHandler<EventArgs>StartRoute;
+        event EventHandler<EventArgs>DayStart;
+        event EventHandler<EventArgs>DayEnd;
+        event EventHandler<EventArgs>EndRoute;
+        event EventHandler<EventArgs>ChangeRoute;
+        event EventHandler<EventArgs>StartRoute;
 
         /// <summary>
         /// Start driving for a given amount of time.

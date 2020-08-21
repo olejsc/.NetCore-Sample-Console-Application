@@ -43,6 +43,7 @@ namespace Transport
             set
             {
                 _ticket = value;
+
             }
         }
 

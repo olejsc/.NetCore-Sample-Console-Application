@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 namespace Transport
 {
+
     public abstract class ABus : ITicketable, IEnterable, IDriveable
     {
         private readonly Guid _busID;
@@ -40,6 +41,14 @@ namespace Transport
             throw new System.NotImplementedException();
         }
 
+        /// <summary>
+        /// An abstract base class with all the common parameters any type of bus needs.
+        /// </summary>
+        /// <param name="wheels"> The number of wheels this bus have</param>
+        /// <param name="isAtMaximumCapacity">Represents if the buss if currently full or not</param>
+        /// <param name="handicapSeats">Number of handicapseats in the bus</param>
+        /// <param name="seats">Number of regular seats in the bus</param>
+        /// <param name="standingSpots">Number of standing spots in the bus</param>
         protected ABus (byte wheels = 6, bool isAtMaximumCapacity = false, byte handicapSeats = 2, byte seats = 20, byte standingSpots = 8)
         {
             // buss "id"
@@ -97,7 +106,9 @@ namespace Transport
                 _engine = value;
             }
         }
-
+        /// <summary>
+        /// Checks if the bus is full or not.
+        /// </summary>
         public bool IsAtMaximumCapacity
         {
             get
@@ -111,6 +122,9 @@ namespace Transport
             }
         }
 
+        /// <summary>
+        /// Sets or get the number of handicapseats in the bus.
+        /// </summary>
         public byte HandicapSeats
         {
             get
@@ -137,6 +151,9 @@ namespace Transport
             }
         }
 
+        /// <summary>
+        /// A <see cref="List{T}"/> of <see cref="ITicket"/> on the bus. Represents people, through the ITicket interface.
+        /// </summary>
         public List<ITicket> People
         {
             get
