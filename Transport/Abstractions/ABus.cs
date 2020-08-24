@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
+using Transport.Types;
+
 namespace Transport
 {
 
@@ -36,6 +39,8 @@ namespace Transport
 
         private readonly Thread _engineThread;
 
+        private BusTaskScheduler _busTaskScheduler;
+
         public ABus ()
         {
             throw new System.NotImplementedException();
@@ -49,7 +54,13 @@ namespace Transport
         /// <param name="handicapSeats">Number of handicapseats in the bus</param>
         /// <param name="seats">Number of regular seats in the bus</param>
         /// <param name="standingSpots">Number of standing spots in the bus</param>
-        protected ABus (byte wheels = 6, bool isAtMaximumCapacity = false, byte handicapSeats = 2, byte seats = 20, byte standingSpots = 8)
+        /// <param name="busTaskScheduler">The task scheduler for this bus</param>
+        protected ABus (byte wheels = 6,
+                        bool isAtMaximumCapacity = false,
+                        byte handicapSeats = 2,
+                        byte seats = 20,
+                        byte standingSpots = 8,
+                        BusTaskScheduler busTaskScheduler = null)
         {
             // buss "id"
             _busID = Guid.NewGuid();
@@ -67,12 +78,12 @@ namespace Transport
             People = new List<ITicket>(seats + handicapSeats + standingSpots + 1);
 
 
-            // Thread
+            // Thread 
             _engineThread = new Thread(new ParameterizedThreadStart(Engine.Run));
             _engineThread.Name = $"Thread {BusID.ToString()}";
             _engineThread.IsBackground = true;
-            Console.WriteLine($"Bus created: {BusID.ToString()}" );
-
+            Console.WriteLine($"Bus created: {BusID.ToString()}");
+            BusTaskScheduler = busTaskScheduler;
         }
 
         /// <summary>
@@ -109,10 +120,12 @@ namespace Transport
         /// <summary>
         /// Checks if the bus is full or not.
         /// </summary>
+        // TODO : Add driver seat property.
         public bool IsAtMaximumCapacity
         {
             get
             {
+                // +1 for the driver.
                 return People.Count < Seats + HandicapSeats + StandingSpots + 1;
             }
 
@@ -189,6 +202,19 @@ namespace Transport
         }
 
         public Guid BusID => _busID;
+
+        internal BusTaskScheduler BusTaskScheduler
+        {
+            get
+            {
+                return _busTaskScheduler;
+            }
+
+            set
+            {
+                _busTaskScheduler = value;
+            }
+        }
 
         public abstract event EventHandler<EventArgs> DayStart;
         public abstract event EventHandler<EventArgs> DayEnd;

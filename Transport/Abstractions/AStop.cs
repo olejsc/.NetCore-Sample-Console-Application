@@ -14,7 +14,7 @@ namespace Transport
         /// Persons at the stop.
         /// </summary>
         private Queue<APerson> _persons;
-        private Byte _busCapacity;
+        private Byte _capacity;
 
         /// <summary>
         /// The name of the stop.
@@ -46,5 +46,17 @@ namespace Transport
             }
         }
 
+        public byte Capacity
+        {
+            get
+            {
+                return _capacity;
+            }
+
+            set
+            {
+                _capacity = value;
+            }
+        }
     }
 }

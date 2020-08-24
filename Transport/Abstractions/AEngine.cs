@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace Transport
 {
     public abstract class AEngine : IEngineController
     {
+        private readonly CancellationToken _cancellationToken;
         /// <summary>
         /// The horsepower of the engine.
         /// </summary>
