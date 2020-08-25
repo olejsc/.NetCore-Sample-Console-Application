@@ -5,43 +5,73 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace Transport.Types
 {
 
-    public class BusTaskScheduler : TaskScheduler
+    public class BusTaskScheduler : TaskScheduler, IDisposable
     {
+        // source code https://codereview.stackexchange.com/questions/43814/taskscheduler-that-uses-a-dedicated-thread/224916
 
-        
-        private readonly Thread _busMainThread = null;
-        private BlockingCollection<Task> _tasks = new BlockingCollection<Task>();
+
+        readonly BlockingCollection<Task> _tasks = new BlockingCollection<Task>();
+        readonly Thread _thread;
+        readonly CancellationTokenSource _cancellationTokenSource;
+        volatile bool _disposed;
 
         public BusTaskScheduler ()
         {
-            if (!_busMainThread.IsAlive)
-            {
-                _busMainThread.IsBackground = true;
-                _busMainThread.Start();
-            }
-            {
+            _cancellationTokenSource = new CancellationTokenSource();
+            _thread = new Thread(Run);
+            _thread.Start();
 
-            }
         }
         protected override IEnumerable<Task> GetScheduledTasks ()
         {
-            throw new NotImplementedException();
+            return _tasks;
         }
 
         protected override void QueueTask (Task task)
         {
-            throw new NotImplementedException();
+            _tasks.Add(task);
+        }
+
+        void Run ()
+        {
+            while (!_disposed)
+            {
+                try
+                {
+                    var task = _tasks.Take(_cancellationTokenSource.Token);
+                    //Debug.Assert(TryExecuteTask(task));
+                    TryExecuteTask(task);
+                }
+                catch (OperationCanceledException ex)
+                {
+                    Console.WriteLine(ex.StackTrace);
+                    //Debug.Assert(_disposed);
+                }
+            }
         }
 
         protected override bool TryExecuteTaskInline (Task task, bool taskWasPreviouslyQueued)
         {
-            
 
-            throw new NotImplementedException();
+            if(Thread.CurrentThread == _thread)
+            {
+                return TryExecuteTask(task);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public void Dispose ()
+        {
+            _disposed = true;
+            _cancellationTokenSource.Cancel();
         }
     }
 }

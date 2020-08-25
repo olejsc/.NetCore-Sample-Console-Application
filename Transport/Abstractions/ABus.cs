@@ -10,6 +10,8 @@ namespace Transport
 
     public abstract class ABus : ITicketable, IEnterable, IDriveable
     {
+        private ADriver _driver;
+
         private readonly Guid _busID;
         /// <summary>
         /// The number of wheels on the bus.
@@ -40,6 +42,8 @@ namespace Transport
         private readonly Thread _engineThread;
 
         private BusTaskScheduler _busTaskScheduler;
+
+        volatile bool disposed;
 
         public ABus ()
         {
@@ -78,7 +82,7 @@ namespace Transport
             People = new List<ITicket>(seats + handicapSeats + standingSpots + 1);
 
 
-            // Thread 
+            // Thread
             _engineThread = new Thread(new ParameterizedThreadStart(Engine.Run));
             _engineThread.Name = $"Thread {BusID.ToString()}";
             _engineThread.IsBackground = true;
@@ -105,7 +109,7 @@ namespace Transport
         /// <summary>
         /// The engine on the bus.
         /// </summary>
-        public Transport.IEngineController Engine
+        public IEngineController Engine
         {
             get
             {
@@ -193,13 +197,6 @@ namespace Transport
             }
         }
 
-        public Thread EngineThread
-        {
-            get
-            {
-                return _engineThread;
-            }
-        }
 
         public Guid BusID => _busID;
 
@@ -214,6 +211,48 @@ namespace Transport
             {
                 _busTaskScheduler = value;
             }
+        }
+
+        public virtual void Execute ()
+        {
+            int distanceToNextStop = 5+2; // TODO: Add Bus route access and point system to calculate distance between stops.
+            Engine.Start();
+            Drive(false, distanceToNextStop);
+            // Inside Drive() :
+                //CheckIfStopPressed();
+                // NotifyBusstops(3);
+            // If(Location.current == route.NextStop && StopPressed || Route.NextStop.Passengers > 0)
+            //      StopEngine();
+            //      Route.nextstop = route.pop();
+            //      Exit Drivemethod..
+            //OpenDoors();
+                //PassengerExit();
+                //WaitNewPassengerJoin();
+                //CloseDoors();
+            //
+
+
+
+
+
+
+
+            //Task CheckEngine =
+            /*
+            drive :
+            1. Start engine
+            1.1 Notify the 3 next busstops on the route continiuously, concurrently 24/7 while driving about your current speed and position
+
+            2. Drive towards stop.
+            2.1 Check if anyone pressed the stop button.
+            2.2 Check if stop have passengers (skip if last stop of route)
+            2.3 Stop engine at stop if anyone pressed the stop or if stop have passengers ( and bus is not full)
+            2.4 Open the doors of the bus
+            2.5 Let passengers exit the bus
+            2.6 Let new passengers join the bus.
+            2.7 Drive towards next stop, if any. If not, take break if driver havent taken break.
+
+                         */
         }
 
         public abstract event EventHandler<EventArgs> DayStart;
@@ -236,7 +275,7 @@ namespace Transport
             }
         }
 
-        public abstract void Drive (object time);
+        public abstract void Drive (bool lastStopIsNextStop, int distanceToNextStop);
 
         public void RegisterEntrance (ITicket ticket)
         {
@@ -244,5 +283,8 @@ namespace Transport
         }
 
         public abstract void Stop ();
+
+        public abstract bool CheckIfStopButtonPressed ();
+
     }
 }

@@ -22,33 +22,15 @@ namespace Transport
 
         public async void DriveAsync(object time)
         {
-            //Task CheckEngine = 
-            /*
-            drive : 
-            1. Start engine
-            1.1 Notify the 3 next busstops on the route continiuously, concurrently 24/7 while driving about your current speed and position
 
-            2. Drive towards stop.
-            2.1 Check if anyone pressed the stop button.
-            2.2 Check if stop have passengers (skip if last stop of route)
-            2.3 Stop engine at stop if anyone pressed the stop or if stop have passengers ( and bus is not full)
-            2.4 Open the doors of the bus
-            2.5 Let passengers exit the bus
-            2.6 Let new passengers join the bus.
-            2.7 Drive towards next stop, if any. If not, take break if driver havent taken break.
-
-                         * 
-                         * 
-                         */
         }
 
         public override void Drive (object time)
         {
             // Task startTask driveToStop();
-            // Task 
+            // Task
 
             BusTime busTime = (BusTime)time;
-            EngineThread.Start(time);
             Console.WriteLine($"Current people in bus are: { People.Count}");
             DateTime target = new DateTime();
             target = DateTime.Now.AddMilliseconds(busTime.Duration);

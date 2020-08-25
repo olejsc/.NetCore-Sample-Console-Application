@@ -15,7 +15,7 @@ namespace Transport
             // antecedent task settings ("the bus")
             BusTaskScheduler AntecedentBusTaskScheduler = new BusTaskScheduler();
             TaskCreationOptions AntecedentBusTaskCreationOptions = TaskCreationOptions.LongRunning;
-            TaskContinuationOptions AntecedentBusTaskContinuationOptions = TaskContinuationOptions.NotOnFaulted;
+            TaskContinuationOptions AntecedentBusTaskContinuationOptions = TaskContinuationOptions.None;
             using var cts = new CancellationTokenSource();
             CancellationToken cancellationToken = cts.Token;
             TaskFactory AntecedentBusTaskFactory = new TaskFactory(cancellationToken,AntecedentBusTaskCreationOptions,AntecedentBusTaskContinuationOptions,AntecedentBusTaskScheduler);
@@ -23,12 +23,11 @@ namespace Transport
             // Child tasks inside the "bus", settings:
 
 
-            // initialize a new "bus" thread. 
+            // initialize a new "bus" thread.
             Task AntecedentBusTask = AntecedentBusTaskFactory.StartNew(
                 ()=>
             {
                 Console.WriteLine($"Creating Antecedent Bus Task with task ID: {Task.CurrentId}");
-                
 
             }, cancellationToken,AntecedentBusTaskCreationOptions,AntecedentBusTaskScheduler
             );
@@ -58,7 +57,7 @@ namespace Transport
             // antecedent task settings ("the bus")
             BusTaskScheduler AntecedentBusTaskScheduler = new BusTaskScheduler();
             TaskCreationOptions AntecedentBusTaskCreationOptions = TaskCreationOptions.LongRunning;
-            TaskContinuationOptions AntecedentBusTaskContinuationOptions = TaskContinuationOptions.NotOnFaulted;
+            TaskContinuationOptions AntecedentBusTaskContinuationOptions = TaskContinuationOptions.None;
             using var cts = new CancellationTokenSource();
             CancellationToken cancellationToken = cts.Token;
             TaskFactory AntecedentBusTaskFactory = new TaskFactory(cancellationToken,AntecedentBusTaskCreationOptions,AntecedentBusTaskContinuationOptions,AntecedentBusTaskScheduler);
@@ -67,30 +66,30 @@ namespace Transport
 
             foreach (ABus bus in busses)
             {
-                // initialize a new "bus" thread. 
+                // initialize a new "bus" thread.
                 Task AntecedentBusTask = AntecedentBusTaskFactory.StartNew(
                 ()=>
                 {
                     Console.WriteLine($"Creating Antecedent Bus Task with task ID: {Task.CurrentId}");
-
 
                 }, cancellationToken,AntecedentBusTaskCreationOptions,AntecedentBusTaskScheduler
             );
             }
 
-            Parallel.ForEach(busses, (bus) =>
+            /*Parallel.ForEach(busses, (bus) =>
             {
-                // initialize a new "bus" thread. 
+                // initialize a new "bus" thread.
                 Task AntecedentBusTask = AntecedentBusTaskFactory.StartNew(
                 ()=>
-                {
-                    Console.WriteLine($"Creating Antecedent Bus Task with task ID: {Task.CurrentId}");
-                    bus.Drive(time);
+                    {
+                        Console.WriteLine($"Creating Antecedent Bus Task with task ID: {Task.CurrentId}");
+                        bus.Drive(time);
 
-                }, cancellationToken,AntecedentBusTaskCreationOptions,AntecedentBusTaskScheduler
-            );
-            });
-            
+                    }, cancellationToken,AntecedentBusTaskCreationOptions,AntecedentBusTaskScheduler
+                );
+
+            });*/
+
         }
 
 
