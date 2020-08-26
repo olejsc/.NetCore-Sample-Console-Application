@@ -92,7 +92,7 @@ namespace Transport
 
         }
 
-        public override void Execute ()
+        public override async void Execute ()
         {
             Task engineTask = BusTaskFactory.StartNew(() =>
             {
@@ -106,7 +106,7 @@ namespace Transport
                     Console.WriteLine($"Inside Organizing Task : {Task.CurrentId} and thread : {Thread.CurrentThread.ManagedThreadId} on bus : {BusID}");
                     Thread.Sleep(2000);
                     CancellationDrivingTokenSource.Cancel();
-                    Task DriveTask =  BusTaskFactory.StartNew(async ()=>
+                    Task DriveTask =  BusTaskFactory.StartNew(()=>
                         {
                             Console.WriteLine($"Inside Drive Task : {Task.CurrentId} and thread : {Thread.CurrentThread.ManagedThreadId}");
                             Drive(Route.Count > 1, CancellationDrivingTokenSource.Token);
@@ -175,6 +175,7 @@ namespace Transport
 
                 }
             }, CancellationDrivingTokenSource.Token, TaskCreationOptions.AttachedToParent, BusTaskScheduler);
+            await DriveOrganizingtask;
         }
 
         public override bool ShouldStopAtTargetStop ()
