@@ -12,7 +12,8 @@ namespace Transport
     {
         #region Fields
 
-
+        public static int BusCounter = 0;
+        public int bussNumber;
         private ADriver _driver;
         private LinkedList<int> _route;
         private LinkedListNode<int> _nextStop;
@@ -144,7 +145,6 @@ namespace Transport
 
             set
             {
-                Console.WriteLine($"Location value: {value} in : {Task.CurrentId} in thread: {Thread.CurrentThread.ManagedThreadId} on Bus: {BusID}");
                 _location = value;
             }
         }
@@ -332,6 +332,7 @@ namespace Transport
 
         public ABus ()
         {
+            bussNumber = BusCounter++;
             TaskFactory busTaskFactory = new TaskFactory(BusTaskCancellationToken,TaskCreationOptions.AttachedToParent, TaskContinuationOptions.LazyCancellation,BusTaskScheduler);
         }
 
@@ -352,6 +353,7 @@ namespace Transport
         {
             // buss "id"
             _busID = Guid.NewGuid();
+            bussNumber = BusCounter++;
 
             // bus tecnical variables
             Wheels = wheels;
@@ -529,6 +531,13 @@ namespace Transport
 
         public abstract bool ShouldStopAtTargetStop ();
         public abstract void Stop ();
+
+        public static void PrintBusStateToConsole (int columposition, int rowposition, string threadID, string currentlyDoing )
+        {
+            Console.SetCursorPosition(columposition, rowposition);
+            Console.WriteLine($"Bus:{rowposition} - Thread: {threadID} - currently doing: {currentlyDoing}");
+            Console.Beep();
+        }
 
         #endregion Methods
     }

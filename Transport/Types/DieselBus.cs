@@ -97,24 +97,27 @@ namespace Transport
         {
             Task engineTask = BusTaskFactory.StartNew(() =>
             {
-                Console.WriteLine("Hi!");
+                PrintBusStateToConsole(0,bussNumber,Thread.CurrentThread.ManagedThreadId.ToString(),"Starting Engine");
                 Engine.Start();
+                Thread.Sleep(1000);
             }, DrivingCTS.Token, TaskCreationOptions.AttachedToParent, BusTaskScheduler);
-            Task DriveOrganizingtask = Task.Run(() =>
+            Task DriveOrganizingtask = BusTaskFactory.StartNew(() =>
             {
                 while (!CancellationDrivingTokenSource.Token.IsCancellationRequested)
                 {
-                    Console.WriteLine($"Inside Organizing Task : {Task.CurrentId} and thread : {Thread.CurrentThread.ManagedThreadId} on bus : {BusID}");
+                    PrintBusStateToConsole(0,bussNumber,Thread.CurrentThread.ManagedThreadId.ToString(),"Organizing Driving..");
                     Thread.Sleep(2000);
                     //CancellationDrivingTokenSource.Cancel();
-                    Task DriveTask =  BusTaskFactory.StartNew(()=>
+                    Task DriveTask =  Task.Run(()=>
                         {
-                            Console.WriteLine($"Inside Drive Task : {Task.CurrentId} and thread : {Thread.CurrentThread.ManagedThreadId}");
+                            PrintBusStateToConsole(0,bussNumber,Thread.CurrentThread.ManagedThreadId.ToString(),"Driving...");
                             Drive(Route.Count > 1, CancellationDrivingTokenSource.Token);
-                        },CancellationDrivingTokenSource.Token, TaskCreationOptions.AttachedToParent | TaskCreationOptions.DenyChildAttach ,BusTaskScheduler)
+                            Thread.Sleep(1000);
+                        },CancellationDrivingTokenSource.Token)
                     .ContinueWith(t =>
                     {
-                        Console.WriteLine($"Inside NotifyBuisStop task: {Task.CurrentId} and thread : {Thread.CurrentThread.ManagedThreadId}");
+                        PrintBusStateToConsole(0,bussNumber,Thread.CurrentThread.ManagedThreadId.ToString(),"Notifying the next busstops..");
+                        Thread.Sleep(1500);
                         // TODO
                         // notify 3 next busstops on the route about our current position, speed and time.
                     }, CancellationDrivingTokenSource.Token,
@@ -122,7 +125,8 @@ namespace Transport
                         BusTaskScheduler)
                     .ContinueWith(CheckLocationTask =>
                     {
-                        Console.WriteLine($"Inside CheckLocationTask : {Task.CurrentId} and thread : {Thread.CurrentThread.ManagedThreadId}");
+                        PrintBusStateToConsole(0,bussNumber,Thread.CurrentThread.ManagedThreadId.ToString(),"Checking if we've reached the place..");
+                        Thread.Sleep(2000);
                         // Check if We've arrived at location. In case, exit these continuation tasks in the drive logic.
                         if (ArrivedAtTargetStop() && ShouldStopAtTargetStop())
                         {
@@ -147,7 +151,7 @@ namespace Transport
                     .ContinueWith(StopPressedTask =>
                     {
 
-                        Console.WriteLine("Inside StopPressed task..");
+                        PrintBusStateToConsole(0,bussNumber,Thread.CurrentThread.ManagedThreadId.ToString(),"Checking if stop button should be pressed..");
                         // If there is no people, no button is pressed.
                         if(People.Count == 0)
                         {
@@ -179,7 +183,8 @@ namespace Transport
 
 
                 }
-            }, CancellationDrivingTokenSource.Token);
+            },CancellationDrivingTokenSource.Token, TaskCreationOptions.AttachedToParent , BusTaskScheduler);
+            PrintBusStateToConsole(0, bussNumber, Thread.CurrentThread.ManagedThreadId.ToString(), "Got out!");
         }
 
         public override bool ShouldStopAtTargetStop ()
@@ -198,16 +203,12 @@ namespace Transport
 
         public override void Drive (bool lastStopIsNextStop, CancellationToken token)
         {
-            Console.WriteLine("Inside drive logic..");
             if (!token.IsCancellationRequested)
             {
-                Console.WriteLine("Inside drive logic..2");
                 if (Route.Count > 0)
                 {
-                    Console.WriteLine("Inside drive logic..3");
                     if (Location < Route.Last.Value)
                     {
-                        Console.WriteLine("Inside drive logic..4");
                         Location += 1;
                     }
                     else

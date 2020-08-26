@@ -42,11 +42,8 @@ namespace Transport
                 Task AntecedentBusTask = AntecedentBusTaskFactory.StartNew(
                 ()=>
                     {
-                        Console.WriteLine($"Creating Antecedent Bus Task with task ID: {Task.CurrentId} on Thread: {Thread.CurrentThread.ManagedThreadId} on bus: {bus.BusID}");
-
                         bus.Route = new LinkedList<int>(routes);
                         bus.Execute();
-                        Console.WriteLine("Executed bus.");
                     }, cancellationToken,TaskCreationOptions.LongRunning,AntecedentBusTaskScheduler
                 );
             }

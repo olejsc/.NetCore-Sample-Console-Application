@@ -11,9 +11,11 @@ namespace Transport.Types
     {
         // source code https://codereview.stackexchange.com/questions/43814/taskscheduler-that-uses-a-dedicated-thread/224916
 
-
+        public override int MaximumConcurrencyLevel { get { return 1; } }
         readonly BlockingCollection<Task> _tasks = new BlockingCollection<Task>();
         readonly Thread _thread;
+
+
         volatile bool _disposed;
 
         public BusTaskScheduler ()
@@ -40,6 +42,8 @@ namespace Transport.Types
                 {
                     var task = _tasks.Take();
                     //Debug.Assert(TryExecuteTask(task));
+                    //TryExecuteTask(task);
+
                     TryExecuteTaskInline(task,false);
                 }
                 catch (OperationCanceledException ex)
