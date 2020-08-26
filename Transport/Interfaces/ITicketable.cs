@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Transport
+﻿namespace Transport
 {
     /// <summary>
     /// A interface for registering when a <see cref="ITicket"/> enters the vehicle.

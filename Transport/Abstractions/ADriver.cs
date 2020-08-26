@@ -1,4 +1,6 @@
-﻿namespace Transport
+﻿using Transport.Abstractions;
+
+namespace Transport
 {
     public class ADriver
     {
@@ -6,6 +8,11 @@
         public int FirstName { get; }
         public int LastName { get; }
 
-        public abstract
+        public int Energy { set; get; }
+
+        public int EnergyConsumptionPerHour = 15;
+
+        public DrivingAbility GetDrivingAbility { get;}
+
     }
 }

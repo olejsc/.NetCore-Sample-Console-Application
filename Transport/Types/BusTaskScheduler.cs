@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Concurrent;
 
 namespace Transport.Types
 {
@@ -58,7 +55,7 @@ namespace Transport.Types
         protected override bool TryExecuteTaskInline (Task task, bool taskWasPreviouslyQueued)
         {
 
-            if(Thread.CurrentThread == _thread)
+            if (Thread.CurrentThread == _thread)
             {
                 return TryExecuteTask(task);
             }

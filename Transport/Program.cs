@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using Transport.Types;
@@ -26,10 +27,10 @@ namespace Transport
             // initialize a new "bus" thread.
             Task AntecedentBusTask = AntecedentBusTaskFactory.StartNew(
                 ()=>
-            {
-                Console.WriteLine($"Creating Antecedent Bus Task with task ID: {Task.CurrentId}");
+                {
+                    Console.WriteLine($"Creating Antecedent Bus Task with task ID: {Task.CurrentId}");
 
-            }, cancellationToken,AntecedentBusTaskCreationOptions,AntecedentBusTaskScheduler
+                }, cancellationToken,AntecedentBusTaskCreationOptions,AntecedentBusTaskScheduler
             );
 
 
@@ -71,6 +72,9 @@ namespace Transport
                 ()=>
                 {
                     Console.WriteLine($"Creating Antecedent Bus Task with task ID: {Task.CurrentId}");
+                    List<int> routes = new List<int>{1,2,3,4,7,10,14};
+                    bus.Route = new LinkedList<int>(routes);
+                    bus.Execute();
 
                 }, cancellationToken,AntecedentBusTaskCreationOptions,AntecedentBusTaskScheduler
             );

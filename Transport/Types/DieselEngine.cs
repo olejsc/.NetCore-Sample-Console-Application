@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 
 namespace Transport
@@ -69,7 +67,7 @@ namespace Transport
 
             set
             {
-                if(value > FuelCapacity)
+                if (value > FuelCapacity)
                 {
                     _fuel = FuelCapacity;
                 }
@@ -89,7 +87,7 @@ namespace Transport
 
             protected set
             {
-                if(_horsePower == 0)
+                if (_horsePower == 0)
                 {
                     _horsePower = value;
                 }
@@ -114,7 +112,7 @@ namespace Transport
 
         public override void Refuel (int amount)
         {
-            if(amount >= Fuel)
+            if (amount >= Fuel)
             {
                 Fuel = FuelCapacity;
             }
@@ -136,20 +134,20 @@ namespace Transport
             {
                 Start();
             }
-            else if(Fuel == 0f)
+            else if (Fuel == 0f)
             {
                 OnFuelEmpty(this, new EngineEventArgs { Stopped = true });
             }
             else
             {
-                while(now < target)
+                while (now < target)
                 {
                     for (int i = 0; i < numberOfTicks; i++)
                     {
                         Thread.Sleep(busTime.Timestep);
                         CalculateFuelConsumption();
                         Fuel -= 60;
-                        if(Fuel == 0)
+                        if (Fuel == 0)
                         {
                             OnFuelEmpty(this, new EngineEventArgs { Stopped = true });
                             break;
@@ -171,7 +169,7 @@ namespace Transport
             throw new NotImplementedException();
         }
 
-        void OnFuelEmpty(object sender, EngineEventArgs args)
+        void OnFuelEmpty (object sender, EngineEventArgs args)
         {
             Stop();
             FuelFull.Invoke(null, new EngineEventArgs { Stopped = true });

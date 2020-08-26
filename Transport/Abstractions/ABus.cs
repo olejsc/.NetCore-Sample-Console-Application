@@ -1,110 +1,89 @@
-﻿using System;
+﻿using MathNet.Numerics;
+using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Collections.Specialized;
 using System.Threading;
 using System.Threading.Tasks;
 using Transport.Types;
 
 namespace Transport
 {
-
-    public abstract class ABus : ITicketable, IEnterable, IDriveable
+    public abstract class ABus : ITicketable, IEnterable
     {
-        private ADriver _driver;
+        #region Fields
 
+
+        private ADriver _driver;
+        private LinkedList<int> _route;
+        private LinkedListNode<int> _nextStop;
         private readonly Guid _busID;
-        /// <summary>
-        /// The number of wheels on the bus.
-        /// </summary>
-        private Byte _wheels;
-        /// <summary>
-        /// The engine on the bus.
-        /// </summary>
-        private IEngineController _engine;
+        private readonly int _busSpeed = 1;
+        private readonly int timeStepPerUnitOfSpeed = 10; // in seconds
+
+        private CancellationTokenSource _cancellationDrivingTokenSource;
+
         /// <summary>
         /// The maximum capacity of people on the bus, including the driver.
         /// </summary>
         private Byte _capacity;
 
+        /// <summary>
+        /// The engine on the bus.
+        /// </summary>
+        private IEngineController _engine;
+
+        /// <summary>
+        /// Number of handicapseats.
+        /// </summary>
+        private Byte _handicapSeats;
+
         private bool _isAtMaximumCapacity;
+        /// <summary>
+        /// A integer representing this bus' current location.
+        /// </summary>
+        private int _location;
 
         /// <summary>
         /// People on the buss.
         /// </summary>
         private List<ITicket> _people;
-        /// <summary>
-        /// Number of handicapseats.
-        /// </summary>
-        private Byte _handicapSeats;
+
         private Byte _seats;
         private Byte _standingSpots;
-
-        private readonly Thread _engineThread;
-
-        private BusTaskScheduler _busTaskScheduler;
-
-        volatile bool disposed;
-
-        public ABus ()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        /// <summary>
-        /// An abstract base class with all the common parameters any type of bus needs.
-        /// </summary>
-        /// <param name="wheels"> The number of wheels this bus have</param>
-        /// <param name="isAtMaximumCapacity">Represents if the buss if currently full or not</param>
-        /// <param name="handicapSeats">Number of handicapseats in the bus</param>
-        /// <param name="seats">Number of regular seats in the bus</param>
-        /// <param name="standingSpots">Number of standing spots in the bus</param>
-        /// <param name="busTaskScheduler">The task scheduler for this bus</param>
-        protected ABus (byte wheels = 6,
-                        bool isAtMaximumCapacity = false,
-                        byte handicapSeats = 2,
-                        byte seats = 20,
-                        byte standingSpots = 8,
-                        BusTaskScheduler busTaskScheduler = null)
-        {
-            // buss "id"
-            _busID = Guid.NewGuid();
-
-            // bus tecnical variables
-            Wheels = wheels;
-            Engine = new DieselEngine();
-
-
-            // Bus capacity
-            IsAtMaximumCapacity = isAtMaximumCapacity;
-            HandicapSeats = handicapSeats;
-            Seats = seats;
-            StandingSpots = standingSpots;
-            People = new List<ITicket>(seats + handicapSeats + standingSpots + 1);
-
-
-            // Thread
-            _engineThread = new Thread(new ParameterizedThreadStart(Engine.Run));
-            _engineThread.Name = $"Thread {BusID.ToString()}";
-            _engineThread.IsBackground = true;
-            Console.WriteLine($"Bus created: {BusID.ToString()}");
-            BusTaskScheduler = busTaskScheduler;
-        }
-
+        private bool _stopButtonPressed;
         /// <summary>
         /// The number of wheels on the bus.
         /// </summary>
-        public byte Wheels
-        {
-            get
-            {
-                return _wheels;
-            }
+        private Byte _wheels;
 
-            set
-            {
-                _wheels = value;
-            }
-        }
+        private CancellationToken busTaskCancellationToken;
+        private TaskFactory _busTaskFactory;
+        private BusTaskScheduler _busTaskScheduler = new BusTaskScheduler();
+        private CancellationTokenSource _DrivingCTS = new CancellationTokenSource();
+        private volatile bool disposed;
+
+        #endregion Fields
+
+        #region Events
+
+        public abstract event EventHandler<EventArgs> ChangeRoute;
+
+        public abstract event EventHandler<EventArgs> DayEnd;
+
+        public abstract event EventHandler<EventArgs> DayStart;
+
+        public abstract event EventHandler<EventArgs> EndRoute;
+
+        public abstract event EventHandler<EventArgs> StartRoute;
+
+        #endregion Events
+
+        #region Properties
+
+        public Guid BusID => _busID;
+
+        public int BusSpeed => _busSpeed;
+
 
         /// <summary>
         /// The engine on the bus.
@@ -119,23 +98,6 @@ namespace Transport
             set
             {
                 _engine = value;
-            }
-        }
-        /// <summary>
-        /// Checks if the bus is full or not.
-        /// </summary>
-        // TODO : Add driver seat property.
-        public bool IsAtMaximumCapacity
-        {
-            get
-            {
-                // +1 for the driver.
-                return People.Count < Seats + HandicapSeats + StandingSpots + 1;
-            }
-
-            protected set
-            {
-                _isAtMaximumCapacity = value;
             }
         }
 
@@ -155,16 +117,34 @@ namespace Transport
             }
         }
 
-        public byte Seats
+        /// <summary>
+        /// Checks if the bus is full or not.
+        /// </summary>
+        // TODO : Add driver seat property.
+        public bool IsAtMaximumCapacity
         {
             get
             {
-                return _seats;
+                // +1 for the driver.
+                return People.Count < Seats + HandicapSeats + StandingSpots + 1;
+            }
+
+            protected set
+            {
+                _isAtMaximumCapacity = value;
+            }
+        }
+
+        public int Location
+        {
+            get
+            {
+                return _location;
             }
 
             set
             {
-                _seats = value;
+                _location = value;
             }
         }
 
@@ -184,6 +164,19 @@ namespace Transport
             }
         }
 
+        public byte Seats
+        {
+            get
+            {
+                return _seats;
+            }
+
+            set
+            {
+                _seats = value;
+            }
+        }
+
         public byte StandingSpots
         {
             get
@@ -197,10 +190,116 @@ namespace Transport
             }
         }
 
+        public bool StopButtonPressed
+        {
+            get
+            {
+                return _stopButtonPressed;
+            }
 
-        public Guid BusID => _busID;
+            set
+            {
+                _stopButtonPressed = value;
+            }
+        }
 
-        internal BusTaskScheduler BusTaskScheduler
+        public int TimeStepPerUnitOfSpeed => timeStepPerUnitOfSpeed;
+
+        /// <summary>
+        /// The number of wheels on the bus.
+        /// </summary>
+        public byte Wheels
+        {
+            get
+            {
+                return _wheels;
+            }
+
+            set
+            {
+                _wheels = value;
+            }
+        }
+
+        public ADriver Driver
+        {
+            get
+            {
+                return _driver;
+            }
+
+            set
+            {
+                _driver = value;
+            }
+        }
+
+        public LinkedList<int> Route
+        {
+            get
+            {
+                return _route;
+            }
+
+            set
+            {
+                _route = value;
+            }
+        }
+
+        public LinkedListNode<int> NextStop
+        {
+            get
+            {
+                return _nextStop;
+            }
+
+            set
+            {
+                _nextStop = value;
+            }
+        }
+
+        public CancellationTokenSource CancellationDrivingTokenSource
+        {
+            get
+            {
+                return _cancellationDrivingTokenSource;
+            }
+
+            set
+            {
+                _cancellationDrivingTokenSource = value;
+            }
+        }
+
+        public CancellationToken BusTaskCancellationToken
+        {
+            get
+            {
+                return busTaskCancellationToken;
+            }
+
+            set
+            {
+                busTaskCancellationToken = value;
+            }
+        }
+
+        public TaskFactory BusTaskFactory
+        {
+            get
+            {
+                return _busTaskFactory;
+            }
+
+            set
+            {
+                _busTaskFactory = value;
+            }
+        }
+
+        public BusTaskScheduler BusTaskScheduler
         {
             get
             {
@@ -213,29 +312,188 @@ namespace Transport
             }
         }
 
-        public virtual void Execute ()
+        public CancellationTokenSource DrivingCTS
         {
-            int distanceToNextStop = 5+2; // TODO: Add Bus route access and point system to calculate distance between stops.
-            Engine.Start();
-            Drive(false, distanceToNextStop);
+            get
+            {
+                return _DrivingCTS;
+            }
+
+            set
+            {
+                _DrivingCTS = value;
+            }
+        }
+
+        #endregion Properties
+
+        #region Constructors
+
+        public ABus ()
+        {
+            TaskFactory busTaskFactory = new TaskFactory(BusTaskCancellationToken,TaskCreationOptions.AttachedToParent, TaskContinuationOptions.LazyCancellation,BusTaskScheduler);
+        }
+
+        /// <summary>
+        /// An abstract base class with all the common parameters any type of bus needs.
+        /// </summary>
+        /// <param name="wheels"> The number of wheels this bus have</param>
+        /// <param name="isAtMaximumCapacity">Represents if the buss if currently full or not</param>
+        /// <param name="handicapSeats">Number of handicapseats in the bus</param>
+        /// <param name="seats">Number of regular seats in the bus</param>
+        /// <param name="standingSpots">Number of standing spots in the bus</param>
+        /// <param name="busTaskScheduler">The task scheduler for this bus</param>
+        protected ABus (byte wheels = 6,
+                        bool isAtMaximumCapacity = false,
+                        byte handicapSeats = 2,
+                        byte seats = 20,
+                        byte standingSpots = 8)
+        {
+            // buss "id"
+            _busID = Guid.NewGuid();
+
+            // bus tecnical variables
+            Wheels = wheels;
+            Engine = new DieselEngine();
+
+            // Bus capacity
+            IsAtMaximumCapacity = isAtMaximumCapacity;
+            HandicapSeats = handicapSeats;
+            Seats = seats;
+            StandingSpots = standingSpots;
+            People = new List<ITicket>(seats + handicapSeats + standingSpots + 1);
+
+            Console.WriteLine($"Bus created: {BusID.ToString()}");
+            TaskFactory busTaskFactory = new TaskFactory(BusTaskCancellationToken,TaskCreationOptions.AttachedToParent, TaskContinuationOptions.LazyCancellation,BusTaskScheduler);
+        }
+
+        #endregion Constructors
+
+        #region Methods
+
+        public abstract bool ArrivedAtTargetStop ();
+
+        public abstract int CalculateDistanceToTarget ();
+
+        public abstract void OpenDoors ();
+
+        public abstract void CloseDoors ();
+
+        public abstract void WaitPassengerJoining ();
+
+        public abstract void WaitPassengersLeaving ();
+
+
+        public abstract void LeaveStop ();
+
+        public bool CanEnter (ITicket Ticket)
+        {
+            // TODO: Add conditional logic to check if handicapped seats are taken for handicap-tickets etc.
+            // TODO: Check if ticket expired.
+            if (!IsAtMaximumCapacity)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Checks if any of the passengers have pressed the stop button.
+        /// </summary>
+
+        public abstract bool CheckIfStopButtonPressed ();
+
+        public abstract void Drive (bool lastStopIsNextStop, CancellationToken token);
+
+        public virtual async void Execute ()
+        {
+            Task engineTask = BusTaskFactory.StartNew(() =>
+            {
+                Engine.Start();
+            }, DrivingCTS.Token, BusTaskFactory.CreationOptions, BusTaskScheduler);
+            engineTask.Wait(DrivingCTS.Token);
+            Task DriveOrganizingtask = BusTaskFactory.StartNew(() =>
+            {
+                while (!CancellationDrivingTokenSource.Token.IsCancellationRequested)
+                {
+                    var DriveTask = BusTaskFactory.StartNew(()=>
+                    {
+
+                    },CancellationDrivingTokenSource.Token, TaskCreationOptions.AttachedToParent,BusTaskScheduler)
+                    .ContinueWith(NotifyBussStopsTask =>
+                    {
+                        // TODO
+                        // notify 3 next busstops on the route about our current position, speed and time.
+                    }, CancellationDrivingTokenSource.Token,
+                        TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.AttachedToParent,
+                        BusTaskScheduler)
+                    .ContinueWith(CheckLocationTask =>
+                    {
+                        // Check if We've arrived at location. In case, exit these continuation tasks in the drive logic.
+                        if (ArrivedAtTargetStop() && ShouldStopAtTargetStop())
+                        {
+                            Engine.Stop();
+                            Task.Delay(2000);
+                            CancellationDrivingTokenSource.Cancel();
+                        }
+                        // Arrived at stop but we shouldn't stop because no passengers to pick up.
+                        else if (ArrivedAtTargetStop())
+                        {
+                            CancellationDrivingTokenSource.Cancel();
+                        }
+                        // We've not arrived at the stop yet, so keep driving.
+                        else
+                        {
+
+                        }
+                    }, CancellationDrivingTokenSource.Token, TaskContinuationOptions.AttachedToParent| TaskContinuationOptions.ExecuteSynchronously| TaskContinuationOptions.NotOnCanceled, BusTaskScheduler);
+
+                        Drive(Route.Count > 1, CancellationDrivingTokenSource.Token);
+                    }
+            }, CancellationDrivingTokenSource.Token, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning, BusTaskScheduler);
+            Task StopPressedTask = DriveOrganizingtask.ContinueWith(StopPressedTask =>
+                {
+                    // If there is no people, no button is pressed.
+                    if(People.Count == 0){
+                        StopButtonPressed = false;
+                    }
+                    // If there are people, but only one stop left, the button is pressed.
+                    else if(Route.Count == 1 && People.Count > 0)
+                    {
+                        StopButtonPressed = true;
+                        CancellationDrivingTokenSource.Cancel();
+                    }
+                    // 
+                    else
+                    {
+                        if(((Route.Count * People.Count) / 100) > 0.5f)
+                        {
+                            StopButtonPressed = true;
+                            CancellationDrivingTokenSource.Cancel();
+                        }
+                        else
+                        {
+                            StopButtonPressed = false;
+                        }
+                    }
+                    // check if stop button is pressed
+                }, DrivingCTS.Token, TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.AttachedToParent, BusTaskScheduler);
+
             // Inside Drive() :
-                //CheckIfStopPressed();
-                // NotifyBusstops(3);
+            //CheckIfStopPressed();
+            // NotifyBusstops(3);
             // If(Location.current == route.NextStop && StopPressed || Route.NextStop.Passengers > 0)
             //      StopEngine();
             //      Route.nextstop = route.pop();
             //      Exit Drivemethod..
             //OpenDoors();
-                //PassengerExit();
-                //WaitNewPassengerJoin();
-                //CloseDoors();
+            //PassengerExit();
+            //WaitNewPassengerJoin();
+            //CloseDoors();
             //
-
-
-
-
-
-
 
             //Task CheckEngine =
             /*
@@ -255,36 +513,22 @@ namespace Transport
                          */
         }
 
-        public abstract event EventHandler<EventArgs> DayStart;
-        public abstract event EventHandler<EventArgs> DayEnd;
-        public abstract event EventHandler<EventArgs> EndRoute;
-        public abstract event EventHandler<EventArgs> ChangeRoute;
-        public abstract event EventHandler<EventArgs> StartRoute;
-
-        public bool CanEnter (ITicket Ticket)
-        {
-            // TODO: Add conditional logic to check if handicapped seats are taken for handicap-tickets etc.
-            // TODO: Check if ticket expired.
-            if (!IsAtMaximumCapacity)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public abstract void Drive (bool lastStopIsNextStop, int distanceToNextStop);
-
+        /// <summary>
+        /// Notifies the next busstopps in advance about this bus estamited time of arrival to them.
+        /// </summary>
+        /// <param name="bussStopsInAdvanceToNofity"> The number of busstops in advance to notify.</param>
+        /// <remarks> If no busstops are left on the route, this method does nothing.</remarks>
+        public abstract void NotifyNextBusstops (int bussStopsInAdvanceToNofity);
         public void RegisterEntrance (ITicket ticket)
         {
             People.Add(ticket);
         }
 
+        public abstract void ResetStopVariables ();
+
+        public abstract bool ShouldStopAtTargetStop ();
         public abstract void Stop ();
 
-        public abstract bool CheckIfStopButtonPressed ();
-
+        #endregion Methods
     }
 }

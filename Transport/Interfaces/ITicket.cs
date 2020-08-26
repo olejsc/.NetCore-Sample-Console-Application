@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Transport
+﻿namespace Transport
 {
     /// <summary>
     /// A interface for registering entrance to a vehicle.

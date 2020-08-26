@@ -1,6 +1,4 @@
 using NUnit.Framework;
-using NUnit.Framework.Constraints;
-using System;
 using Transport;
 namespace NUnitTransportTests
 {
@@ -16,7 +14,7 @@ namespace NUnitTransportTests
         }
 
         [Test]
-        public void BusGuid_ShouldNotBeNullAfterConstructor()
+        public void BusGuid_ShouldNotBeNullAfterConstructor ()
         {
             // Arrange
 
@@ -35,7 +33,7 @@ namespace NUnitTransportTests
         [Test]
         public void Wheels_PropertyExist ()
         {
-            Assert.That(bus,Has.Property("Wheels"));
+            Assert.That(bus, Has.Property("Wheels"));
         }
 
         [Test]
@@ -64,7 +62,7 @@ namespace NUnitTransportTests
         [Test]
         public void Abus_PeopleInitializationValueIsEqualToSumOfAllSeatsAndDriver ()
         {
-            Assert.AreEqual(bus.Seats+bus.StandingSpots+bus.HandicapSeats+1, bus.People.Capacity);
+            Assert.AreEqual(bus.Seats + bus.StandingSpots + bus.HandicapSeats + 1, bus.People.Capacity);
         }
 
         [Test]
