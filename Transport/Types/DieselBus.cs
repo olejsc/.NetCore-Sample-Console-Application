@@ -9,6 +9,7 @@ namespace Transport
     {
         public DieselBus () : base(6, false, 2, 20, 8)
         {
+            base.BusTaskScheduler = new BusTaskScheduler();
             //base.Engine.FuelFull += OnFuelFull;
             //base.Engine.FuelEmpty += OnFuelEmpty;
         }
