@@ -40,7 +40,7 @@ namespace Transport.Types
                 {
                     var task = _tasks.Take();
                     //Debug.Assert(TryExecuteTask(task));
-                    TryExecuteTask(task);
+                    TryExecuteTaskInline(task,false);
                 }
                 catch (OperationCanceledException ex)
                 {
