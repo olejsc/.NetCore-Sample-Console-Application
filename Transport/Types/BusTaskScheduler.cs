@@ -55,8 +55,6 @@ namespace Transport.Types
 
             if (Thread.CurrentThread == _thread)
             {
-                Console.WriteLine("Trying to execute task inline on same thread!");
-                Console.WriteLine($"Task ID: {task.Id} and thread ID: {Thread.CurrentThread.ManagedThreadId}");
                 return TryExecuteTask(task);
             }
             else

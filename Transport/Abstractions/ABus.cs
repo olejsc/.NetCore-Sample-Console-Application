@@ -144,6 +144,7 @@ namespace Transport
 
             set
             {
+                Console.WriteLine($"Location value: {value} in : {Task.CurrentId} in thread: {Thread.CurrentThread.ManagedThreadId} on Bus: {BusID}");
                 _location = value;
             }
         }

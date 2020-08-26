@@ -15,7 +15,7 @@ namespace Transport
         {
 
             IVehicleFactory factory = new BusFactory();
-            ABus[] busses = factory.CreateVehicles(1);
+            ABus[] busses = factory.CreateVehicles(3);
             Run(busses);
             Console.ReadLine();
         }

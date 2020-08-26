@@ -11,6 +11,7 @@ namespace Transport
         {
             base.BusTaskScheduler = new BusTaskScheduler();
             CancellationDrivingTokenSource = new CancellationTokenSource();
+            Location = 10;
             //base.Engine.FuelFull += OnFuelFull;
             //base.Engine.FuelEmpty += OnFuelEmpty;
         }
@@ -92,32 +93,32 @@ namespace Transport
 
         }
 
-        public override async void Execute ()
+        public override void Execute ()
         {
             Task engineTask = BusTaskFactory.StartNew(() =>
             {
+                Console.WriteLine("Hi!");
                 Engine.Start();
             }, DrivingCTS.Token, TaskCreationOptions.AttachedToParent, BusTaskScheduler);
-            engineTask.Wait(DrivingCTS.Token);
-            Task DriveOrganizingtask = BusTaskFactory.StartNew(() =>
+            Task DriveOrganizingtask = Task.Run(() =>
             {
                 while (!CancellationDrivingTokenSource.Token.IsCancellationRequested)
                 {
                     Console.WriteLine($"Inside Organizing Task : {Task.CurrentId} and thread : {Thread.CurrentThread.ManagedThreadId} on bus : {BusID}");
                     Thread.Sleep(2000);
-                    CancellationDrivingTokenSource.Cancel();
+                    //CancellationDrivingTokenSource.Cancel();
                     Task DriveTask =  BusTaskFactory.StartNew(()=>
                         {
                             Console.WriteLine($"Inside Drive Task : {Task.CurrentId} and thread : {Thread.CurrentThread.ManagedThreadId}");
                             Drive(Route.Count > 1, CancellationDrivingTokenSource.Token);
-                        },CancellationDrivingTokenSource.Token, TaskCreationOptions.AttachedToParent,BusTaskScheduler)
-                    .ContinueWith(NotifyBussStopsTask =>
+                        },CancellationDrivingTokenSource.Token, TaskCreationOptions.AttachedToParent | TaskCreationOptions.DenyChildAttach ,BusTaskScheduler)
+                    .ContinueWith(t =>
                     {
                         Console.WriteLine($"Inside NotifyBuisStop task: {Task.CurrentId} and thread : {Thread.CurrentThread.ManagedThreadId}");
                         // TODO
                         // notify 3 next busstops on the route about our current position, speed and time.
                     }, CancellationDrivingTokenSource.Token,
-                        TaskContinuationOptions.AttachedToParent,
+                        TaskContinuationOptions.AttachedToParent | TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.DenyChildAttach,
                         BusTaskScheduler)
                     .ContinueWith(CheckLocationTask =>
                     {
@@ -145,6 +146,8 @@ namespace Transport
                         BusTaskScheduler)
                     .ContinueWith(StopPressedTask =>
                     {
+
+                        Console.WriteLine("Inside StopPressed task..");
                         // If there is no people, no button is pressed.
                         if(People.Count == 0)
                         {
@@ -153,6 +156,7 @@ namespace Transport
                         // If there are people, but only one stop left, the button is pressed.
                         else if(Route.Count == 1 && People.Count > 0)
                         {
+                            Console.WriteLine("Inside StopPressed task.. cancelling the token!");
                             StopButtonPressed = true;
                             CancellationDrivingTokenSource.Cancel();
                         }
@@ -161,6 +165,7 @@ namespace Transport
                         {
                             if(((Route.Count * People.Count) / 100) > 0.5f)
                             {
+                                Console.WriteLine("Inside StopPressed task..cancelling the token!22");
                                 StopButtonPressed = true;
                                 CancellationDrivingTokenSource.Cancel();
                             }
@@ -170,12 +175,11 @@ namespace Transport
                             }
                         }
                         // check if stop button is pressed
-                    }, DrivingCTS.Token, TaskContinuationOptions.AttachedToParent, BusTaskScheduler);
+                    }, DrivingCTS.Token, TaskContinuationOptions.AttachedToParent | TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.DenyChildAttach, BusTaskScheduler);
 
 
                 }
-            }, CancellationDrivingTokenSource.Token, TaskCreationOptions.AttachedToParent, BusTaskScheduler);
-            await DriveOrganizingtask;
+            }, CancellationDrivingTokenSource.Token);
         }
 
         public override bool ShouldStopAtTargetStop ()
@@ -194,12 +198,16 @@ namespace Transport
 
         public override void Drive (bool lastStopIsNextStop, CancellationToken token)
         {
+            Console.WriteLine("Inside drive logic..");
             if (!token.IsCancellationRequested)
             {
+                Console.WriteLine("Inside drive logic..2");
                 if (Route.Count > 0)
                 {
-                    if (Location < Route.First.Value)
+                    Console.WriteLine("Inside drive logic..3");
+                    if (Location < Route.Last.Value)
                     {
+                        Console.WriteLine("Inside drive logic..4");
                         Location += 1;
                     }
                     else
