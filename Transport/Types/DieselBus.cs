@@ -10,6 +10,7 @@ namespace Transport
         public DieselBus () : base(6, false, 2, 20, 8)
         {
             base.BusTaskScheduler = new BusTaskScheduler();
+            CancellationDrivingTokenSource = new CancellationTokenSource();
             //base.Engine.FuelFull += OnFuelFull;
             //base.Engine.FuelEmpty += OnFuelEmpty;
         }
@@ -64,7 +65,7 @@ namespace Transport
                 StopButtonPressed = true;
                 CancellationDrivingTokenSource.Cancel();
             }
-            // 
+            //
             else
             {
                 if (((Route.Count * People.Count) / 100) > 0.5f)
@@ -102,19 +103,25 @@ namespace Transport
             {
                 while (!CancellationDrivingTokenSource.Token.IsCancellationRequested)
                 {
-                    var DriveTask = BusTaskFactory.StartNew(()=>
-{
-
-                    },CancellationDrivingTokenSource.Token, TaskCreationOptions.AttachedToParent,BusTaskScheduler)
+                    Console.WriteLine($"Inside Organizing Task : {Task.CurrentId} and thread : {Thread.CurrentThread.ManagedThreadId} on bus : {BusID}");
+                    Thread.Sleep(2000);
+                    CancellationDrivingTokenSource.Cancel();
+                    Task DriveTask =  BusTaskFactory.StartNew(async ()=>
+                        {
+                            Console.WriteLine($"Inside Drive Task : {Task.CurrentId} and thread : {Thread.CurrentThread.ManagedThreadId}");
+                            Drive(Route.Count > 1, CancellationDrivingTokenSource.Token);
+                        },CancellationDrivingTokenSource.Token, TaskCreationOptions.AttachedToParent,BusTaskScheduler)
                     .ContinueWith(NotifyBussStopsTask =>
                     {
+                        Console.WriteLine($"Inside NotifyBuisStop task: {Task.CurrentId} and thread : {Thread.CurrentThread.ManagedThreadId}");
                         // TODO
                         // notify 3 next busstops on the route about our current position, speed and time.
                     }, CancellationDrivingTokenSource.Token,
-                        TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.AttachedToParent,
-BusTaskScheduler)
+                        TaskContinuationOptions.AttachedToParent,
+                        BusTaskScheduler)
                     .ContinueWith(CheckLocationTask =>
                     {
+                        Console.WriteLine($"Inside CheckLocationTask : {Task.CurrentId} and thread : {Thread.CurrentThread.ManagedThreadId}");
                         // Check if We've arrived at location. In case, exit these continuation tasks in the drive logic.
                         if (ArrivedAtTargetStop() && ShouldStopAtTargetStop())
                         {
@@ -132,44 +139,56 @@ BusTaskScheduler)
                         {
 
                         }
-                    }, CancellationDrivingTokenSource.Token, TaskContinuationOptions.AttachedToParent| TaskContinuationOptions.ExecuteSynchronously| TaskContinuationOptions.NotOnCanceled, BusTaskScheduler);
+                    }, CancellationDrivingTokenSource.Token,
+                        TaskContinuationOptions.AttachedToParent|
+                        TaskContinuationOptions.ExecuteSynchronously,
+                        BusTaskScheduler)
+                    .ContinueWith(StopPressedTask =>
+                    {
+                        // If there is no people, no button is pressed.
+                        if(People.Count == 0)
+                        {
+                            StopButtonPressed = false;
+                        }
+                        // If there are people, but only one stop left, the button is pressed.
+                        else if(Route.Count == 1 && People.Count > 0)
+                        {
+                            StopButtonPressed = true;
+                            CancellationDrivingTokenSource.Cancel();
+                        }
+                        //
+                        else
+                        {
+                            if(((Route.Count * People.Count) / 100) > 0.5f)
+                            {
+                                StopButtonPressed = true;
+                                CancellationDrivingTokenSource.Cancel();
+                            }
+                            else
+                            {
+                                StopButtonPressed = false;
+                            }
+                        }
+                        // check if stop button is pressed
+                    }, DrivingCTS.Token, TaskContinuationOptions.AttachedToParent, BusTaskScheduler);
 
-                    Drive(Route.Count > 1, CancellationDrivingTokenSource.Token);
-}
-            }, CancellationDrivingTokenSource.Token, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning, BusTaskScheduler);
-            Task StopPressedTask = DriveOrganizingtask.ContinueWith(StopPressedTask =>
-            {
-                // If there is no people, no button is pressed.
-                if(People.Count == 0)
-                {
-                    StopButtonPressed = false;
+
                 }
-                // If there are people, but only one stop left, the button is pressed.
-                else if(Route.Count == 1 && People.Count > 0)
-                {
-                    StopButtonPressed = true;
-                    CancellationDrivingTokenSource.Cancel();
-                }
-                // 
-                else
-                {
-                    if(((Route.Count * People.Count) / 100) > 0.5f)
-                    {
-                        StopButtonPressed = true;
-                        CancellationDrivingTokenSource.Cancel();
-                    }
-                    else
-                    {
-                        StopButtonPressed = false;
-                    }
-                }
-                // check if stop button is pressed
-            }, DrivingCTS.Token, TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.AttachedToParent, BusTaskScheduler);
-}
+            }, CancellationDrivingTokenSource.Token, TaskCreationOptions.AttachedToParent, BusTaskScheduler);
+        }
 
         public override bool ShouldStopAtTargetStop ()
         {
-            throw new NotImplementedException();
+            Random rnd = new Random();
+            int temp = rnd.Next(0, 1);
+            if(temp == 0)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         public override void Drive (bool lastStopIsNextStop, CancellationToken token)
@@ -215,7 +234,7 @@ BusTaskScheduler)
         {
             if(Route.First.Value == Location)
             {
-
+                // TODO
             }
         }
 

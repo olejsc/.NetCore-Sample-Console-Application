@@ -14,12 +14,10 @@ namespace Transport.Types
 
         readonly BlockingCollection<Task> _tasks = new BlockingCollection<Task>();
         readonly Thread _thread;
-        readonly CancellationTokenSource _cancellationTokenSource;
         volatile bool _disposed;
 
         public BusTaskScheduler ()
         {
-            _cancellationTokenSource = new CancellationTokenSource();
             _thread = new Thread(Run);
             _thread.Start();
 
@@ -40,7 +38,7 @@ namespace Transport.Types
             {
                 try
                 {
-                    var task = _tasks.Take(_cancellationTokenSource.Token);
+                    var task = _tasks.Take();
                     //Debug.Assert(TryExecuteTask(task));
                     TryExecuteTask(task);
                 }
@@ -57,6 +55,8 @@ namespace Transport.Types
 
             if (Thread.CurrentThread == _thread)
             {
+                Console.WriteLine("Trying to execute task inline on same thread!");
+                Console.WriteLine($"Task ID: {task.Id} and thread ID: {Thread.CurrentThread.ManagedThreadId}");
                 return TryExecuteTask(task);
             }
             else
@@ -68,7 +68,6 @@ namespace Transport.Types
         public void Dispose ()
         {
             _disposed = true;
-            _cancellationTokenSource.Cancel();
         }
     }
 }

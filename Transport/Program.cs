@@ -13,86 +13,43 @@ namespace Transport
 
         static void Main (string[] args)
         {
-            // antecedent task settings ("the bus")
-            BusTaskScheduler AntecedentBusTaskScheduler = new BusTaskScheduler();
-            TaskCreationOptions AntecedentBusTaskCreationOptions = TaskCreationOptions.LongRunning;
-            TaskContinuationOptions AntecedentBusTaskContinuationOptions = TaskContinuationOptions.None;
-            using var cts = new CancellationTokenSource();
-            CancellationToken cancellationToken = cts.Token;
-            TaskFactory AntecedentBusTaskFactory = new TaskFactory(cancellationToken,AntecedentBusTaskCreationOptions,AntecedentBusTaskContinuationOptions,AntecedentBusTaskScheduler);
-
-            // Child tasks inside the "bus", settings:
-
-
-            // initialize a new "bus" thread.
-            Task AntecedentBusTask = AntecedentBusTaskFactory.StartNew(
-                ()=>
-                {
-                    Console.WriteLine($"Creating Antecedent Bus Task with task ID: {Task.CurrentId}");
-
-                }, cancellationToken,AntecedentBusTaskCreationOptions,AntecedentBusTaskScheduler
-            );
-
-
-
-            BusTaskScheduler busTaskScheduler = new BusTaskScheduler();
-            TaskCreationOptions taskCreationOptions = TaskCreationOptions.LongRunning;
-            CancellationToken busTaskCancellationToken = cts.Token;
-            TaskContinuationOptions taskContinuationOptions = TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.AttachedToParent;
-            TaskFactory busTaskFactory = new TaskFactory(busTaskCancellationToken,taskCreationOptions, taskContinuationOptions,busTaskScheduler);
 
             IVehicleFactory factory = new BusFactory();
-            ABus[] busses = factory.CreateVehicles(4);
-            Object time = new BusTime(ushort.MaxValue,100);
-            Run(busses, time);
+            ABus[] busses = factory.CreateVehicles(1);
+            Run(busses);
             Console.ReadLine();
         }
 
-        private static void Run (ABus[] busses, object time)
+        private static void Run (ABus[] busses)
         {
-            BusTime busTime = (BusTime)time;
-            DateTime now = new DateTime();
-            DateTime target = now.AddMilliseconds(busTime.Duration);
-            UInt16 numberOfTicks = (ushort)((target.Millisecond - now.Millisecond)/busTime.Timestep);
 
             // antecedent task settings ("the bus")
             BusTaskScheduler AntecedentBusTaskScheduler = new BusTaskScheduler();
-            TaskCreationOptions AntecedentBusTaskCreationOptions = TaskCreationOptions.LongRunning;
             TaskContinuationOptions AntecedentBusTaskContinuationOptions = TaskContinuationOptions.None;
             using var cts = new CancellationTokenSource();
             CancellationToken cancellationToken = cts.Token;
-            TaskFactory AntecedentBusTaskFactory = new TaskFactory(cancellationToken,AntecedentBusTaskCreationOptions,AntecedentBusTaskContinuationOptions,AntecedentBusTaskScheduler);
+            TaskFactory AntecedentBusTaskFactory = new TaskFactory(cancellationToken,
+                TaskCreationOptions.LongRunning,
+                TaskContinuationOptions.AttachedToParent,AntecedentBusTaskScheduler);
 
 
-
-            foreach (ABus bus in busses)
+            List<int> routes = new List<int>{1,2,3,4,7,10,14};
+            int i = 0;
+            foreach(ABus bus in busses)
             {
-                // initialize a new "bus" thread.
-                Task AntecedentBusTask = AntecedentBusTaskFactory.StartNew(
-                ()=>
-                {
-                    Console.WriteLine($"Creating Antecedent Bus Task with task ID: {Task.CurrentId}");
-                    List<int> routes = new List<int>{1,2,3,4,7,10,14};
-                    bus.Route = new LinkedList<int>(routes);
-                    bus.Execute();
 
-                }, cancellationToken,AntecedentBusTaskCreationOptions,AntecedentBusTaskScheduler
-            );
-            }
-
-            /*Parallel.ForEach(busses, (bus) =>
-            {
                 // initialize a new "bus" thread.
                 Task AntecedentBusTask = AntecedentBusTaskFactory.StartNew(
                 ()=>
                     {
-                        Console.WriteLine($"Creating Antecedent Bus Task with task ID: {Task.CurrentId}");
-                        bus.Drive(time);
+                        Console.WriteLine($"Creating Antecedent Bus Task with task ID: {Task.CurrentId} on Thread: {Thread.CurrentThread.ManagedThreadId} on bus: {bus.BusID}");
 
-                    }, cancellationToken,AntecedentBusTaskCreationOptions,AntecedentBusTaskScheduler
+                        bus.Route = new LinkedList<int>(routes);
+                        bus.Execute();
+                        Console.WriteLine("Executed bus.");
+                    }, cancellationToken,TaskCreationOptions.LongRunning,AntecedentBusTaskScheduler
                 );
-
-            });*/
+            }
 
         }
 

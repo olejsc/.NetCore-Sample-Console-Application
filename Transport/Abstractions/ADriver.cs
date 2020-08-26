@@ -10,7 +10,7 @@ namespace Transport
 
         public int Energy { set; get; }
 
-        public int EnergyConsumptionPerHour = 15;
+        public readonly int EnergyConsumptionPerHour = 15;
 
         public DrivingAbility GetDrivingAbility { get;}
 

@@ -25,7 +25,7 @@ namespace Transport
         /// <summary>
         /// The maximum capacity of people on the bus, including the driver.
         /// </summary>
-        private Byte _capacity;
+        private readonly Byte _capacity;
 
         /// <summary>
         /// The engine on the bus.
@@ -363,8 +363,8 @@ namespace Transport
             StandingSpots = standingSpots;
             People = new List<ITicket>(seats + handicapSeats + standingSpots + 1);
 
-            Console.WriteLine($"Bus created: {BusID.ToString()}");
-            TaskFactory busTaskFactory = new TaskFactory(BusTaskCancellationToken,TaskCreationOptions.AttachedToParent, TaskContinuationOptions.LazyCancellation,BusTaskScheduler);
+
+            BusTaskFactory = new TaskFactory(BusTaskCancellationToken,TaskCreationOptions.AttachedToParent, TaskContinuationOptions.LazyCancellation,BusTaskScheduler);
         }
 
         #endregion Constructors
@@ -466,7 +466,7 @@ namespace Transport
                         StopButtonPressed = true;
                         CancellationDrivingTokenSource.Cancel();
                     }
-                    // 
+                    //
                     else
                     {
                         if(((Route.Count * People.Count) / 100) > 0.5f)
