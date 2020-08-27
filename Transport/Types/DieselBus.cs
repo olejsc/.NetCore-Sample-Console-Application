@@ -93,27 +93,44 @@ namespace Transport
 
         }
 
-        public override void Execute ()
+        public override void Execute (BusTaskScheduler scheduler)
         {
-            Task engineTask = BusTaskFactory.StartNew(() =>
+            base.BusTaskScheduler = scheduler;
+
+/*            Task engineTask = Task.Run(() =>
             {
                 PrintBusStateToConsole(0,bussNumber,Thread.CurrentThread.ManagedThreadId.ToString(),"Starting Engine");
                 Engine.Start();
                 Thread.Sleep(1000);
-            }, DrivingCTS.Token, TaskCreationOptions.AttachedToParent, BusTaskScheduler);
+            }, DrivingCTS.Token);*/
             Task DriveOrganizingtask = BusTaskFactory.StartNew(() =>
             {
+                PrintBusStateToConsole(0,bussNumber,Thread.CurrentThread.ManagedThreadId.ToString(),"Starting Engine");
+                Engine.Start();
+                Thread.Sleep(1000);
                 while (!CancellationDrivingTokenSource.Token.IsCancellationRequested)
                 {
                     PrintBusStateToConsole(0,bussNumber,Thread.CurrentThread.ManagedThreadId.ToString(),"Organizing Driving..");
                     Thread.Sleep(2000);
+                    PrintBusStateToConsole(0,bussNumber,Thread.CurrentThread.ManagedThreadId.ToString(),"Driving...");
+                    Drive(Route.Count > 1, CancellationDrivingTokenSource.Token);
+                    Thread.Sleep(1000);
+                    PrintBusStateToConsole(0,bussNumber,Thread.CurrentThread.ManagedThreadId.ToString(),"Notifying the next busstops..");
+                    Thread.Sleep(1500);
+                    CheckLocation ();
+                    PrintBusStateToConsole(0,bussNumber,Thread.CurrentThread.ManagedThreadId.ToString(),"Checking if we've reached the place..");
+                    Thread.Sleep(2000);
+                    SimulateAndCheckIfStopIsPressed ();
+                    PrintBusStateToConsole(0, bussNumber, Thread.CurrentThread.ManagedThreadId.ToString(), "Checking if we've reached the place..");
+                    Thread.Sleep(2000);
                     //CancellationDrivingTokenSource.Cancel();
-                    Task DriveTask =  Task.Run(()=>
+/*                    Task DriveTask =  BusTaskFactory.StartNew(()=>
                         {
                             PrintBusStateToConsole(0,bussNumber,Thread.CurrentThread.ManagedThreadId.ToString(),"Driving...");
                             Drive(Route.Count > 1, CancellationDrivingTokenSource.Token);
                             Thread.Sleep(1000);
-                        },CancellationDrivingTokenSource.Token)
+                        },CancellationDrivingTokenSource.Token, TaskCreationOptions.AttachedToParent | TaskCreationOptions.DenyChildAttach,
+                        TaskScheduler.FromCurrentSynchronizationContext())
                     .ContinueWith(t =>
                     {
                         PrintBusStateToConsole(0,bussNumber,Thread.CurrentThread.ManagedThreadId.ToString(),"Notifying the next busstops..");
@@ -122,7 +139,7 @@ namespace Transport
                         // notify 3 next busstops on the route about our current position, speed and time.
                     }, CancellationDrivingTokenSource.Token,
                         TaskContinuationOptions.AttachedToParent | TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.DenyChildAttach,
-                        BusTaskScheduler)
+                        TaskScheduler.FromCurrentSynchronizationContext())
                     .ContinueWith(CheckLocationTask =>
                     {
                         PrintBusStateToConsole(0,bussNumber,Thread.CurrentThread.ManagedThreadId.ToString(),"Checking if we've reached the place..");
@@ -147,7 +164,7 @@ namespace Transport
                     }, CancellationDrivingTokenSource.Token,
                         TaskContinuationOptions.AttachedToParent|
                         TaskContinuationOptions.ExecuteSynchronously,
-                        BusTaskScheduler)
+                        TaskScheduler.FromCurrentSynchronizationContext())
                     .ContinueWith(StopPressedTask =>
                     {
 
@@ -179,11 +196,13 @@ namespace Transport
                             }
                         }
                         // check if stop button is pressed
-                    }, DrivingCTS.Token, TaskContinuationOptions.AttachedToParent | TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.DenyChildAttach, BusTaskScheduler);
+                    }, DrivingCTS.Token, TaskContinuationOptions.AttachedToParent | TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.DenyChildAttach, TaskScheduler.FromCurrentSynchronizationContext());*/
 
 
                 }
-            },CancellationDrivingTokenSource.Token, TaskCreationOptions.AttachedToParent , BusTaskScheduler);
+            },CancellationDrivingTokenSource.Token,
+                TaskCreationOptions.AttachedToParent | TaskCreationOptions.DenyChildAttach ,
+                scheduler);
             PrintBusStateToConsole(0, bussNumber, Thread.CurrentThread.ManagedThreadId.ToString(), "Got out!");
         }
 
@@ -253,6 +272,59 @@ namespace Transport
             if (StopButtonPressed && People.Count > 0)
             {
                 People.RemoveAt(0);
+            }
+        }
+
+        public override void CheckLocation ()
+        {
+            PrintBusStateToConsole(0, bussNumber, Thread.CurrentThread.ManagedThreadId.ToString(), "Checking if we've reached the place..");
+            Thread.Sleep(2000);
+            // Check if We've arrived at location. In case, exit these continuation tasks in the drive logic.
+            if (ArrivedAtTargetStop() && ShouldStopAtTargetStop())
+            {
+                Engine.Stop();
+                Task.Delay(2000);
+                CancellationDrivingTokenSource.Cancel();
+            }
+            // Arrived at stop but we shouldn't stop because no passengers to pick up.
+            else if (ArrivedAtTargetStop())
+            {
+                CancellationDrivingTokenSource.Cancel();
+            }
+            // We've not arrived at the stop yet, so keep driving.
+            else
+            {
+
+            }
+        }
+
+        public override void SimulateAndCheckIfStopIsPressed ()
+        {
+            // If there is no people, no button is pressed.
+            if (People.Count == 0)
+            {
+                StopButtonPressed = false;
+            }
+            // If there are people, but only one stop left, the button is pressed.
+            else if (Route.Count == 1 && People.Count > 0)
+            {
+                Console.WriteLine("Inside StopPressed task.. cancelling the token!");
+                StopButtonPressed = true;
+                CancellationDrivingTokenSource.Cancel();
+            }
+            //
+            else
+            {
+                if (((Route.Count * People.Count) / 100) > 0.5f)
+                {
+                    Console.WriteLine("Inside StopPressed task..cancelling the token!22");
+                    StopButtonPressed = true;
+                    CancellationDrivingTokenSource.Cancel();
+                }
+                else
+                {
+                    StopButtonPressed = false;
+                }
             }
         }
     }

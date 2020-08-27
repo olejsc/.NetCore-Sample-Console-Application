@@ -14,15 +14,25 @@ namespace Transport.Types
         public override int MaximumConcurrencyLevel { get { return 1; } }
         readonly BlockingCollection<Task> _tasks = new BlockingCollection<Task>();
         readonly Thread _thread;
-
+        private static int threadIDCounter = 0;
 
         volatile bool _disposed;
 
         public BusTaskScheduler ()
         {
+            threadIDCounter++;
             _thread = new Thread(Run);
+            _thread.Name = $"Thread{threadIDCounter}";
             _thread.Start();
 
+        }
+
+        public BusTaskScheduler(string threadName)
+        {
+            threadIDCounter++;
+            _thread = new Thread(Run);
+            _thread.Name = $"{threadName}{threadIDCounter}";
+            _thread.Start();
         }
         protected override IEnumerable<Task> GetScheduledTasks ()
         {

@@ -26,6 +26,11 @@ namespace Transport
             throw new NotImplementedException();
         }
 
+        public override void CheckLocation ()
+        {
+            throw new NotImplementedException();
+        }
+
         public override void CloseDoors ()
         {
             throw new NotImplementedException();
@@ -58,6 +63,11 @@ namespace Transport
         }
 
         public override bool ShouldStopAtTargetStop ()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void SimulateAndCheckIfStopIsPressed ()
         {
             throw new NotImplementedException();
         }

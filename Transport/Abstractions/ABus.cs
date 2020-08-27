@@ -411,7 +411,7 @@ namespace Transport
 
         public abstract void Drive (bool lastStopIsNextStop, CancellationToken token);
 
-        public virtual async void Execute ()
+        public virtual async void Execute (BusTaskScheduler scheduler)
         {
             Task engineTask = BusTaskFactory.StartNew(() =>
             {
@@ -528,6 +528,10 @@ namespace Transport
         }
 
         public abstract void ResetStopVariables ();
+
+        public abstract void CheckLocation ();
+        public abstract void SimulateAndCheckIfStopIsPressed ();
+
 
         public abstract bool ShouldStopAtTargetStop ();
         public abstract void Stop ();

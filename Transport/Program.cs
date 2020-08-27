@@ -15,7 +15,7 @@ namespace Transport
         {
 
             IVehicleFactory factory = new BusFactory();
-            ABus[] busses = factory.CreateVehicles(3);
+            ABus[] busses = factory.CreateVehicles(2);
             Run(busses);
             Console.ReadLine();
         }
@@ -23,27 +23,28 @@ namespace Transport
         private static void Run (ABus[] busses)
         {
 
-            // antecedent task settings ("the bus")
-            BusTaskScheduler AntecedentBusTaskScheduler = new BusTaskScheduler();
-            TaskContinuationOptions AntecedentBusTaskContinuationOptions = TaskContinuationOptions.None;
-            using var cts = new CancellationTokenSource();
-            CancellationToken cancellationToken = cts.Token;
-            TaskFactory AntecedentBusTaskFactory = new TaskFactory(cancellationToken,
-                TaskCreationOptions.LongRunning,
-                TaskContinuationOptions.AttachedToParent,AntecedentBusTaskScheduler);
-
 
             List<int> routes = new List<int>{1,2,3,4,7,10,14};
             int i = 0;
             foreach(ABus bus in busses)
             {
-
+                Thread.Sleep(200);
+                i++;
+                BusTaskScheduler AntecedentBusTaskScheduler = new BusTaskScheduler("busThread"+i);
+                // antecedent task settings ("the bus")
+                TaskContinuationOptions AntecedentBusTaskContinuationOptions = TaskContinuationOptions.None;
+                using var cts = new CancellationTokenSource();
+                CancellationToken cancellationToken = cts.Token;
+                TaskFactory AntecedentBusTaskFactory = new TaskFactory(cancellationToken,
+                    TaskCreationOptions.LongRunning,
+                    TaskContinuationOptions.AttachedToParent,
+                    AntecedentBusTaskScheduler);
                 // initialize a new "bus" thread.
                 Task AntecedentBusTask = AntecedentBusTaskFactory.StartNew(
                 ()=>
                     {
                         bus.Route = new LinkedList<int>(routes);
-                        bus.Execute();
+                        bus.Execute(AntecedentBusTaskScheduler);
                     }, cancellationToken,TaskCreationOptions.LongRunning,AntecedentBusTaskScheduler
                 );
             }
